@@ -18,17 +18,12 @@ namespace Tarefas.Web.Controllers
                 new Tarefa() { Id = 3, Titulo = "Por o lixo para fora", Descricao = "somente às terças, quintas e sábados" }
             };
         }
-        
-        public IActionResult Details(int id)
+
+/*         public IActionResult Details(int id)
         {
             var tarefa = listaDeTarefas.Find(tarefa => tarefa.Id == id);
             return View(tarefa);
-        }
-
-        public IActionResult Index()
-        {            
-            return View(listaDeTarefas);
-        }
+        } */
 
         public IActionResult Create()
         {
@@ -38,7 +33,7 @@ namespace Tarefas.Web.Controllers
         [HttpPost]
         public IActionResult Create(Tarefa tarefa)
         {
-            var tarefaDTO = new TarefaDTO 
+            var tarefaDTO = new TarefaDTO
             {
                 Titulo = tarefa.Titulo,
                 Descricao = tarefa.Descricao,
@@ -48,7 +43,42 @@ namespace Tarefas.Web.Controllers
             var tarefaDAO = new TarefaDAO();
             tarefaDAO.Criar(tarefaDTO);
 
-            return View();
+            return RedirectToAction("Index");
         }
+
+        public IActionResult Index()
+        {
+            var tarefaDAO = new TarefaDAO();
+            var listDeTarefasDTO = tarefaDAO.Consultar();
+            var listaDeTarefa = new List<Tarefa>();
+
+            foreach (var tarefaDTO in listDeTarefasDTO)
+            {
+                listaDeTarefa.Add(new Tarefa()
+                {
+                    Id = tarefaDTO.Id,
+                    Titulo = tarefaDTO.Titulo,
+                    Descricao = tarefaDTO.Descricao,
+                    Concluida = tarefaDTO.Concluida
+                });
+            }
+            return View(listaDeTarefa);
+        }
+
+        public IActionResult Details(int id)
+        {
+            var tarefaDAO = new TarefaDAO();
+            var tarefaDTO = tarefaDAO.Consultar(id);
+            var tarefa = new Tarefa()
+            {
+                Id = tarefaDTO.Id,
+                Titulo = tarefaDTO.Titulo,
+                Descricao = tarefaDTO.Descricao,
+                Concluida = tarefaDTO.Concluida
+            };
+            return View(tarefa);
+        }
+
+
     }
 }

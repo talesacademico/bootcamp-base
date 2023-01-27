@@ -4,25 +4,26 @@ using System.Data.SQLite;
 using System.IO;
 using System.Linq;
 using Tarefas.DTO;
+using System.Collections.Generic;
 
 namespace Tarefas.DAO
 {
     public class TarefaDAO
     {
         private string DataSourceFile => Environment.CurrentDirectory + "AppTarefasDB.sqlite";
-        public SQLiteConnection Connection => new SQLiteConnection("DataSource="+ DataSourceFile);
-        
+        public SQLiteConnection Connection => new SQLiteConnection("DataSource=" + DataSourceFile);
+
         public TarefaDAO()
         {
-            if(!File.Exists(DataSourceFile))
+            if (!File.Exists(DataSourceFile))
             {
                 CreateDatabase();
             }
         }
-        
+
         private void CreateDatabase()
         {
-            using(var con = Connection)
+            using (var con = Connection)
             {
                 con.Open();
                 con.Execute(
@@ -49,6 +50,44 @@ namespace Tarefas.DAO
                 );
             }
         }
-        
+
+        public List<TarefaDTO> Consultar()
+        {
+            using (var con = Connection)
+            {
+                con.Open();
+                var result = con.Query<TarefaDTO>(
+                    @"SELECT Id, Titulo, Descricao, Concluida FROM  Tarefa"
+                ).ToList();
+                return result;
+            }
+        }
+
+        public TarefaDTO Consultar(int Id)
+        {
+            using (var con = Connection)
+            {
+                con.Open();
+                TarefaDTO resul = con.Query<TarefaDTO>(
+                    @"SELECT Id, Titulo, Descricao, Concluida FROM Tarefa
+                    WHERE Id = @Id", new { Id }
+                ).FirstOrDefault();
+                return resul;
+            }
+        }
+
+        public void Atualizar(TarefaDTO tarefa)
+        {
+            using (var con = Connection)
+            {
+                con.Open();
+                con.Execute(
+
+                    @"UPDATE Tarefa
+                    SET Titulo = @Titulo, Descricao = @Descricao, Concluida = @Concluida
+                    WHERE Id = @Id;", tarefa 
+                );
+            }
+        }
     }
 }
