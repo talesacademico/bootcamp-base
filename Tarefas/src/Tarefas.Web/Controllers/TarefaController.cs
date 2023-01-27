@@ -79,6 +79,21 @@ namespace Tarefas.Web.Controllers
             return View(tarefa);
         }
 
+        public IActionResult Update(Tarefa tarefa){
+             var tarefaDTO = new TarefaDTO
+            {
+                Id = tarefa.Id,
+                Titulo = tarefa.Titulo,
+                Descricao = tarefa.Descricao,
+                Concluida = tarefa.Concluida
+            };
+
+            var tarefaDAO = new TarefaDAO();
+            tarefaDAO.Atualizar(tarefaDTO);
+
+            return RedirectToAction("Index");
+        }
+
 
     }
 }
