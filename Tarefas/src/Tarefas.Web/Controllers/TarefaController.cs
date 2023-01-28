@@ -8,11 +8,11 @@ namespace Tarefas.Web.Controllers
     public class TarefaController : Controller
     {
         public List<Tarefa> listaDeTarefas { get; set; }
-        private TarefaDAO _tarefaDAO;
+        private readonly ITarefaDAO _tarefaDAO;
 
-        public TarefaController()
+        public TarefaController(ITarefaDAO tarefaDAO)
         {
-            _tarefaDAO = new TarefaDAO();
+            _tarefaDAO = tarefaDAO;
             listaDeTarefas = new List<Tarefa>()
             {
                 new Tarefa() { Id = 1, Titulo = "Escovar os dentes" },
@@ -35,6 +35,10 @@ namespace Tarefas.Web.Controllers
         [HttpPost]
         public IActionResult Create(Tarefa tarefa)
         {
+            if (!ModelState.IsValid)
+            {
+                return View();
+            }
             var tarefaDTO = new TarefaDTO
             {
                 Titulo = tarefa.Titulo,
@@ -42,15 +46,15 @@ namespace Tarefas.Web.Controllers
                 Concluida = tarefa.Concluida
             };
 
-            var tarefaDAO = new TarefaDAO();
-            tarefaDAO.Criar(tarefaDTO);
+
+            _tarefaDAO.Criar(tarefaDTO);
 
             return RedirectToAction("Index");
         }
 
         public IActionResult Index()
         {
-           
+
             var listDeTarefasDTO = _tarefaDAO.Consultar();
             var listaDeTarefa = new List<Tarefa>();
 
@@ -83,6 +87,10 @@ namespace Tarefas.Web.Controllers
         [HttpPost]
         public IActionResult Update(Tarefa tarefa)
         {
+            if (!ModelState.IsValid)
+            {
+                return View();
+            }
             var tarefaDTO = new TarefaDTO
             {
                 Id = tarefa.Id,
@@ -98,6 +106,10 @@ namespace Tarefas.Web.Controllers
 
         public IActionResult Update(int id)
         {
+            if (!ModelState.IsValid)
+            {
+                return View();
+            }
 
             var tarefaDTO = _tarefaDAO.Consultar(id);
 

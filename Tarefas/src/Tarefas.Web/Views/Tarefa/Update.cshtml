@@ -1,7 +1,16 @@
 @model Tarefas.Web.Models.Tarefa
 
+@section Scripts{
+    @{
+        await Html.RenderPartialAsync("_ValidationScriptsPartial");
+
+    }
+}
+
 <form asp-action="Update">
 
+    @Html.ValidationSummary()
+    
     <div class="form-group">
         <label asp-for="Titulo">@Html.DisplayNameFor(model => model.Titulo)</label>
         @Html.TextBoxFor(model => model.Titulo, new { @class = "form-control",  })
